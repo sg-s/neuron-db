@@ -66,6 +66,11 @@ methods
 		metrics = self.metrics;
 		all_g = self.all_g;
 
+		if isempty(metrics)
+			disp('No metrics, aborting')
+			return
+		end
+
 		fn = fieldnames(metrics);
 
 		for i = 1:length(fn)
