@@ -212,7 +212,7 @@ methods
 
 
 			try
-				metrics(idx) = xtools.V2metrics(V);
+				metrics(idx) = xtools.V2metrics(V,'sampling_rate',1/x.dt);
 			catch
 				disp('Something went wrong with trying to measure the metrics')
 				continue
