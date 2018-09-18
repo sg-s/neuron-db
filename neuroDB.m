@@ -31,10 +31,6 @@ methods
 	% constructor
 	function self = neuroDB()
 
-
-		self.current_pool = gcp;
-		self.num_workers = self.current_pool.NumWorkers - 1;
-
 		% make xolotl object 
 		A = 0.0628;
 		channels = {'NaV','CaT','CaS','ACurrent','KCa','Kd','HCurrent'};
@@ -61,25 +57,99 @@ methods
 
 		self.x = x;
 
+		self.loadDB;
+
 	end % constructor 
+
+	function consolidate(self)
+
+		metrics = self.metrics;
+		all_g = self.all_g;
+
+		fn = fieldnames(metrics);
+
+		for i = 1:length(fn)
+			disp(['Generating ' fn{i} ' vector...'] )
+			eval([fn{i} ' = vertcat(metrics.(fn{i}));'])
+		end
+
+		save('consolidated.db','all_g','-v7.3','-nocompression')
+		for i = 1:length(fn)
+			save('consolidated.db',fn{i},'-nocompression','-append')
+		end
+
+		disp('Deleting unconsolidated DB files...')
+		all_files = dir([fileparts(which(mfilename)) filesep '*.neuroDB']);
+		for i = 1:length(all_files)
+			delete(all_files(i).name)
+		end
+
+
+	end
+
+	function varargout = show(self, idx)
+
+		self.x.set('*gbar',self.all_g(idx,:))
+		self.x.reset;
+		self.x.integrate;
+
+		if nargout == 1
+			V = self.x.integrate;
+			varargout{1} = V;
+			return
+
+		end
+		self.x.plot;
+
+	end
 
 
 	function self = loadDB(self)
+
+		% load consolidated.db, if it exists 
+		all_files = dir([fileparts(which(mfilename)) filesep 'consolidated.db']);
+		if ~isempty(all_files)
+			load(all_files(1).name,'-mat')
+			var_names = whos('-file',all_files(1).name);
+
+			for i = 1:length(var_names)
+				if strcmp(var_names(i).name,'all_g')
+					eval(['self.' var_names(i).name '=' var_names(i).name ';']);
+				else
+					eval(['self.metrics.' var_names(i).name '=' var_names(i).name ';']);
+				end
+			end
+
+		end
+
 		% load results of prev sim
+		disp('Loading DB...')
 		all_files = dir([fileparts(which(mfilename)) filesep '*.neuroDB']);
 		for i = 1:length(all_files)
+			textbar(i,length(all_files))
 			load([all_files(i).folder filesep all_files(i).name],'-mat')
-			self.metrics = [self.metrics; metrics];
-			self.all_g = [self.all_g; all_g];
+
+			for j = 1:length(var_names)
+				if strcmp(var_names(j).name,'all_g')
+					self.all_g = vertcat(self.all_g,all_g);
+				else
+					this_var = var_names(j).name;
+					eval(['self.metrics.' this_var ' = vertcat(self.metrics.' this_var ', vertcat(metrics.' this_var  '));']);
+				end
+			end
 		end
 		disp([mat2str(size(self.all_g,1)) '  models loaded'])
 
+
+		self.consolidate;
 
 	end
 
 
 	function runOnAllCores(self)
 
+		self.current_pool = gcp;
+		self.num_workers = self.current_pool.NumWorkers - 1;
 
 		disp('Starting workers...')
 
@@ -99,8 +169,8 @@ methods
 		x = self.x;
 
 		n_sims = 0;
-		disp('A        CaS       CaT       H        KCa         Kd        Leak      NaV       FR (Hz)')
-		disp('---------------------------------------------------------------------------------------------')
+		disp('A        CaS       CaT       H        KCa         Kd        Leak      NaV       FR (Hz)    Speed')
+		disp('-------------------------------------------------------------------------------------------------------')
 
 		while true
 
@@ -109,6 +179,8 @@ methods
 				metrics = repmat(xtools.V2metrics(0*temp),1000,1);
 				all_g = NaN(1000,8);
 				idx =  1;
+				time_idx = 1;
+				tic
 			end
 
 			% pick a random point in the cube
@@ -123,13 +195,27 @@ methods
 
 			% transient
 			x.reset;
+			x.AB.CaS.E = 30;
+			x.AB.CaT.E = 30;
 			x.integrate;
 
 			V = x.integrate;
+
+			time_idx = time_idx + 1;
+
+			t = toc;
+
+
 			try
 				metrics(idx) = xtools.V2metrics(V);
 			catch
 				disp('Something went wrong with trying to measure the metrics')
+				continue
+			end
+
+
+			if metrics(idx).firing_rate == 0
+				disp('Silent neuron, skipping...')
 				continue
 			end
 
@@ -141,7 +227,7 @@ methods
 			end
 
 			fprintf(flstring(oval(metrics(idx).firing_rate),10))
-
+			fprintf(flstring(oval(time_idx/t),10))
 			fprintf('\n')
 
 
@@ -152,10 +238,10 @@ methods
 				% need to save 
 				disp('Saving...')
 				save_name = [GetMD5(now) '.neuroDB'];
-				save(save_name,'all_g','metrics');
+				save(save_name,'all_g','metrics','-v7.3');
 
-				disp('A        CaS       CaT       H        KCa         Kd        Leak      NaV       FR (Hz)')
-				disp('---------------------------------------------------------------------------------------------')
+				disp('A        CaS       CaT       H        KCa         Kd        Leak      NaV       FR (Hz)    Speed')
+				disp('-------------------------------------------------------------------------------------------------------')
 
 			end
 
