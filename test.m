@@ -6,7 +6,16 @@ end
 
 % find bursting models with some specific props
 
-show_these = find(n.metrics.n_spikes_per_burst_mean > 4 & n.metrics.n_spikes_per_burst_mean < 6 & n.metrics.spike_peak_std < 5 & n.metrics.duty_cycle_mean > .2 & n.metrics.duty_cycle_mean < .5 & n.metrics.duty_cycle_std < .1 & n.metrics.min_V_mean < -60);  
+show_these = find(n.metrics.burst_period > .9e3 ...
+	            & n.metrics.burst_period < 1.1e3 ...
+	            & n.metrics.burst_period_std < .1 ...
+	            & n.metrics.duty_cycle_mean > .2 ...
+	            & n.metrics.duty_cycle_mean < .3 ...
+	            & n.metrics.duty_cycle_std < .1 ...
+	            & n.metrics.n_spikes_per_burst_mean > 10 ...
+	            & n.metrics.n_spikes_per_burst_mean < 15 ...
+	            & n.metrics.min_V_in_burst_mean > n.metrics.min_V_mean ...
+	            & n.metrics.min_V_mean < -60);  
 
 
 disp([mat2str(length(show_these)) ' models found matching these criteria'])
@@ -23,10 +32,17 @@ for i = 1:8
 			g = n.all_g(show_these,i);
 			hist(g)
 		else
-			plot(n.all_g(show_these,i),n.all_g(show_these,j),'ko')
+			scatter(n.all_g(show_these,j),n.all_g(show_these,i),10,'MarkerFaceColor',[.5 .5 .5],'MarkerEdgeColor','k','MarkerFaceAlpha',.1,'MarkerEdgeAlpha',.1)
 		end
 	end
 end
+
+n.x.t_end = 5e3;
+ax_V = subplot(3,2,5); hold on
+ax_V.Position = [.05 .05 .5 .3];
+time = (n.x.dt:n.x.dt:n.x.t_end)*1e-3;
+plot_handles = plot(ax_V,time,time*NaN,'k');
+set(ax_V,'XLim',[0 5],'YLim',[-90 60])
 
 % % find spiking neurons
 % show_these = find((isnan(n.metrics.burst_period) | n.metrics.n_spikes_per_burst_mean == 1) & n.metrics.firing_rate > 3);
@@ -34,23 +50,11 @@ end
 
 show_these = shuffle(show_these);
 
-time = (n.x.dt:n.x.dt:n.x.t_end)*1e-3;
-
-figure('outerposition',[300 300 1800 1200],'PaperUnits','points','PaperSize',[1800 1200]); hold on
-for i = 1:4
-	ax(i) = subplot(2,2,i); hold on
-	plot_handles(i) = plot(ax(i),time,time*NaN,'k');
-	set(ax(i),'XLim',[0 5],'YLim',[-90 60])
-end
-
-
 
 for i = 1:length(show_these)
 
-	plot_here = (rem(i,4) + 1);
-
 	V = n.show(show_these(i));
-	plot_handles(plot_here).YData = V;
+	plot_handles.YData = V;
 	drawnow
 
 end

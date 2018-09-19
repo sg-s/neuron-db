@@ -86,7 +86,7 @@ methods
 		disp('Deleting unconsolidated DB files...')
 		all_files = dir([fileparts(which(mfilename)) filesep '*.neuroDB']);
 		for i = 1:length(all_files)
-			delete(all_files(i).name)
+			delete([all_files(i).folder filesep all_files(i).name] )
 		end
 
 
@@ -128,18 +128,27 @@ methods
 		end
 
 		% load results of prev sim
-		disp('Loading DB...')
+		disp('Merging new files into DB...')
+		clear var_names
 		all_files = dir([fileparts(which(mfilename)) filesep '*.neuroDB']);
 		for i = 1:length(all_files)
 			textbar(i,length(all_files))
 			load([all_files(i).folder filesep all_files(i).name],'-mat')
 
+			if ~exist('var_names','var')
+				var_names = [fieldnames(metrics); 'all_g'];
+			end
+
 			for j = 1:length(var_names)
-				if strcmp(var_names(j).name,'all_g')
+				if strcmp(var_names{j},'all_g')
 					self.all_g = vertcat(self.all_g,all_g);
 				else
-					this_var = var_names(j).name;
-					eval(['self.metrics.' this_var ' = vertcat(self.metrics.' this_var ', vertcat(metrics.' this_var  '));']);
+					this_var = var_names{j};
+					try
+						eval(['self.metrics.' this_var ' = vertcat(self.metrics.' this_var ', vertcat(metrics.' this_var  '));']);
+					catch
+						eval(['self.metrics.' this_var ' = vertcat(metrics.' this_var  ');']);
+					end
 				end
 			end
 		end
