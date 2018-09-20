@@ -57,7 +57,6 @@ methods
 
 		self.x = x;
 
-		self.loadDB;
 
 	end % constructor 
 
