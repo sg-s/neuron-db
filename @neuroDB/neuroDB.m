@@ -52,9 +52,8 @@ methods
 		x.t_end = 20e3;
 		x.dt = .1;
 
-		disp('renable this...')
-		%x.transpile;
-		%x.compile;
+		x.transpile;
+		x.compile;
 
 		self.x = x;
 
@@ -65,7 +64,7 @@ methods
 
 	function varargout = show(self, idx)
 
-		self.x.set('*gbar',self.all_g(idx,:))
+		self.x.set('*gbar',self.results.all_g(idx,:))
 		self.x.reset;
 		self.x.integrate;
 
@@ -76,57 +75,6 @@ methods
 
 		end
 		self.x.plot;
-
-	end
-
-
-	function self = loadDB(self)
-
-		% load consolidated.db, if it exists 
-		all_files = dir([fileparts(which(mfilename)) filesep 'consolidated.db']);
-		if ~isempty(all_files)
-			load(all_files(1).name,'-mat')
-			var_names = whos('-file',all_files(1).name);
-
-			for i = 1:length(var_names)
-				if strcmp(var_names(i).name,'all_g')
-					eval(['self.' var_names(i).name '=' var_names(i).name ';']);
-				else
-					eval(['self.metrics.' var_names(i).name '=' var_names(i).name ';']);
-				end
-			end
-
-		end
-
-		% load results of prev sim
-		disp('Merging new files into DB...')
-		clear var_names
-		all_files = dir([fileparts(which(mfilename)) filesep '*.neuroDB']);
-		for i = 1:length(all_files)
-			textbar(i,length(all_files))
-			load([all_files(i).folder filesep all_files(i).name],'-mat')
-
-			if ~exist('var_names','var')
-				var_names = [fieldnames(metrics); 'all_g'];
-			end
-
-			for j = 1:length(var_names)
-				if strcmp(var_names{j},'all_g')
-					self.all_g = vertcat(self.all_g,all_g);
-				else
-					this_var = var_names{j};
-					try
-						eval(['self.metrics.' this_var ' = vertcat(self.metrics.' this_var ', vertcat(metrics.' this_var  '));']);
-					catch
-						eval(['self.metrics.' this_var ' = vertcat(metrics.' this_var  ');']);
-					end
-				end
-			end
-		end
-		disp([mat2str(size(self.all_g,1)) '  models loaded'])
-
-
-		self.consolidate;
 
 	end
 
