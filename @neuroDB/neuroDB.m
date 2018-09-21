@@ -52,44 +52,16 @@ methods
 		x.t_end = 20e3;
 		x.dt = .1;
 
-		x.transpile;
-		x.compile;
+		disp('renable this...')
+		%x.transpile;
+		%x.compile;
 
 		self.x = x;
 
+		self.results.consolidate();
+
 
 	end % constructor 
-
-	function consolidate(self)
-
-		metrics = self.metrics;
-		all_g = self.all_g;
-
-		if isempty(metrics)
-			disp('No metrics, aborting')
-			return
-		end
-
-		fn = fieldnames(metrics);
-
-		for i = 1:length(fn)
-			disp(['Generating ' fn{i} ' vector...'] )
-			eval([fn{i} ' = vertcat(metrics.(fn{i}));'])
-		end
-
-		save('consolidated.db','all_g','-v7.3','-nocompression')
-		for i = 1:length(fn)
-			save('consolidated.db',fn{i},'-nocompression','-append')
-		end
-
-		disp('Deleting unconsolidated DB files...')
-		all_files = dir([fileparts(which(mfilename)) filesep '*.neuroDB']);
-		for i = 1:length(all_files)
-			delete([all_files(i).folder filesep all_files(i).name] )
-		end
-
-
-	end
 
 	function varargout = show(self, idx)
 
