@@ -76,8 +76,7 @@
 			if results.size == self.sim_chunk_size
 				% need to save 
 				disp('Saving...')
-				save_name = [GetMD5(now) '.neuroDB'];
-				save(save_name,'results','-v7.3');
+				results.save([GetMD5(now) '.data']);
 
 				results.reset;
 
