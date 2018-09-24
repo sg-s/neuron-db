@@ -32,33 +32,6 @@ methods
 	% constructor
 	function self = neuroDB()
 
-		results = new(Data(xtools.V2metrics(zeros(1e4,1))));
-		results.add('all_g',8);
-		self.results = results;
-
-		% make xolotl object 
-		A = 0.0628;
-		channels = {'NaV','CaT','CaS','ACurrent','KCa','Kd','HCurrent'};
-		E =         [50   30  30 -80 -80 -80   -20];
-		x = xolotl;
-		x.add('compartment','AB','Cm',10,'A',A);
-		% add Calcium mechanism
-		x.AB.add('CalciumMech1');
-		for i = 1:length(channels)
-			x.AB.add([self.prefix channels{i}],'gbar',rand*10,'E',E(i));
-		end
-		x.AB.add('Leak','gbar',0);
-
-		x.t_end = 20e3;
-		x.dt = .1;
-
-		x.transpile;
-		x.compile;
-
-		self.x = x;
-
-		self.results.consolidate([fileparts(fileparts(which(mfilename))) filesep self.prefix]);
-
 
 	end % constructor 
 
@@ -92,6 +65,46 @@ methods
 		end
 
 		self.workers = F;
+
+	end
+	
+
+	function self = set.prefix(self, value)
+
+		self.prefix = value;
+
+		% make xolotl object 
+		A = 0.0628;
+		channels = {'NaV','CaT','CaS','ACurrent','KCa','Kd','HCurrent'};
+		E =         [50   30  30 -80 -80 -80   -20];
+		x = xolotl;
+		x.add('compartment','AB','Cm',10,'A',A);
+		% add Calcium mechanism
+		x.AB.add('CalciumMech1');
+		for i = 1:length(channels)
+			x.AB.add([self.prefix channels{i}],'gbar',rand*10,'E',E(i));
+		end
+		x.AB.add('Leak','gbar',0);
+
+		x.t_end = 20e3;
+		x.dt = .1;
+
+		x.transpile;
+		x.compile;
+
+		self.x = x;
+
+		results = new(Data(xtools.V2metrics(zeros(1e4,1))));
+		results.add('all_g',8);
+		self.results = results;
+
+		save_dir = [fileparts(fileparts(which(mfilename))) filesep self.prefix];
+
+		if exist(save_dir,'dir') ~= 7
+			mkdir(save_dir)
+		end
+
+		self.results.consolidate(save_dir);
 
 	end
 
