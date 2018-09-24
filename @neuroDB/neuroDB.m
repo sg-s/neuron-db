@@ -57,7 +57,7 @@ methods
 
 		self.x = x;
 
-		self.results.consolidate();
+		self.results.consolidate([fileparts(fileparts(which(mfilename))) filesep self.prefix]);
 
 
 	end % constructor 

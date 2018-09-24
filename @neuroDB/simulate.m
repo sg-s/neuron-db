@@ -76,7 +76,8 @@
 			if results.size == self.sim_chunk_size
 				% need to save 
 				disp('Saving...')
-				results.save([GetMD5(now) '.data']);
+				save_name = [fileparts(fileparts(which(mfilename))) filesep self.prefix GetMD5(now) '.data']
+				results.save(save_name);
 
 				results.reset;
 
