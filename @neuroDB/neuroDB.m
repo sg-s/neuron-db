@@ -15,7 +15,7 @@ properties
 	Leak_range = [0 1];
 
 
-	prefix = 'prinz/';
+	prefix@char
 
 	results@Data
 

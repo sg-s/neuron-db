@@ -4,6 +4,8 @@ if ~exist('n','var')
 	n = neuroDB;
 end
 
+n.prefix = 'prinz/';
+
 % find bursting models with some specific props
 
 show_these = find(n.results.burst_period > .95e3 ...
