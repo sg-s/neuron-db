@@ -29,6 +29,11 @@
 			x.AB.HCurrent.gbar = rand*diff(self.H_range) + self.H_range(1);
 			x.AB.Leak.gbar = rand*diff(self.Leak_range) + self.Leak_range(1);
 
+			% allow for some channels to drop out
+			g = x.get('*gbar');
+			g(rand(8,1)>1 - self.deletion_probability) = 0;
+			x.set('*gbar',g);
+
 			% transient
 			x.reset;
 			x.AB.CaS.E = 30;

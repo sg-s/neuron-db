@@ -25,6 +25,8 @@ properties
 
 	sim_chunk_size = 1e3
 
+	deletion_probability = .05
+
 end
 
 methods
