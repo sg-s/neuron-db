@@ -27,6 +27,8 @@ properties
 
 	deletion_probability = .05
 
+	handles
+
 end
 
 methods
