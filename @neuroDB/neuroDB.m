@@ -100,6 +100,10 @@ methods
 
 		results = new(Data(xtools.V2metrics(zeros(1e4,1))));
 		results.add('all_g',8);
+		results.add('CV_ISI_down',10);
+		results.add('CV_ISI_up',10);
+		results.add('f_down',10);
+		results.add('f_up',10);
 		self.results = results;
 
 		save_dir = [fileparts(fileparts(which(mfilename))) filesep self.prefix];

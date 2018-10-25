@@ -10,6 +10,10 @@
 		results = Data(xtools.V2metrics(zeros(1e4,1)));
 		results = results.new();
 		results.add('all_g',8);
+		results.add('CV_ISI_down',10);
+		results.add('CV_ISI_up',10);
+		results.add('f_down',10);
+		results.add('f_up',10);
 		results.prealloc(self.sim_chunk_size);
 
 		while true
@@ -56,8 +60,7 @@
 
 
 			if new_metrics.firing_rate == 0
-				disp('Silent neuron, skipping...')
-				continue
+				disp('Silent neuron...')
 			end
 
 			this_all_g = x.get('*gbar');
@@ -71,6 +74,12 @@
 			fprintf(flstring(oval(time_idx/t),10))
 			fprintf('\n')
 
+			% measure the f-I curve
+			data = self.x.fI;
+			new_metrics.f_up = data.f_up;
+			new_metrics.f_down = data.f_down;
+			new_metrics.CV_ISI_up = data.CV_ISI_up;
+			new_metrics.CV_ISI_down = data.CV_ISI_down;
 
 			% append
 			new_metrics.all_g = this_all_g;
