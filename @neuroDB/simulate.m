@@ -58,6 +58,23 @@
 				continue
 			end
 
+			% ignore things outside keep_only
+			if new_metrics.duty_cycle_mean < self.keep_only_duty_cycle(1)
+				continue
+			end
+
+			if new_metrics.duty_cycle_mean > self.keep_only_duty_cycle(2)
+				continue
+			end
+
+			if new_metrics.burst_period < self.keep_only_burst_period(1)
+				continue
+			end
+
+			if new_metrics.burst_period > self.keep_only_burst_period(2)
+				continue
+			end
+
 
 			if new_metrics.firing_rate == 0
 				disp('Silent neuron...')

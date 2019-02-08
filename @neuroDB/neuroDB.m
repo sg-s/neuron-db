@@ -29,6 +29,9 @@ properties
 
 	handles
 
+	keep_only_burst_period = [-Inf Inf];
+	keep_only_duty_cycle = [0  1];
+
 end
 
 methods
