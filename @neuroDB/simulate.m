@@ -58,13 +58,18 @@
 				continue
 			end
 
-			if isempty(self.keep_only_burst_period)
+			if new_metrics.firing_rate == 0
+				disp('Silent neuron...')
+				continue
+			end
+
+			if ~isempty(self.keep_only_burst_period)
 				if isnan(new_metrics.burst_period)
 					continue
 				end
 			end
 
-			if isempty(self.keep_only_duty_cycle)
+			if ~isempty(self.keep_only_duty_cycle)
 				if isnan(new_metrics.duty_cycle_mean)
 					continue
 				end
@@ -88,9 +93,7 @@
 			end
 
 
-			if new_metrics.firing_rate == 0
-				disp('Silent neuron...')
-			end
+			
 
 			this_all_g = x.get('*gbar');
 
