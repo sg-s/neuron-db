@@ -58,6 +58,18 @@
 				continue
 			end
 
+			if isempty(self.keep_only_burst_period)
+				if isnan(new_metrics.burst_period)
+					continue
+				end
+			end
+
+			if isempty(self.keep_only_duty_cycle)
+				if isnan(new_metrics.duty_cycle_mean)
+					continue
+				end
+			end
+
 			% ignore things outside keep_only
 			if new_metrics.duty_cycle_mean < self.keep_only_duty_cycle(1)
 				continue
