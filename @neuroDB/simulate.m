@@ -42,9 +42,10 @@
 			x.reset;
 			x.AB.CaS.E = 30;
 			x.AB.CaT.E = 30;
-			x.integrate;
+			
 
 			try
+				x.integrate;
 				V = x.integrate;
 			catch
 				% sometimes the integration fails because the 
