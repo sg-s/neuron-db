@@ -44,7 +44,13 @@
 			x.AB.CaT.E = 30;
 			x.integrate;
 
-			V = x.integrate;
+			try
+				V = x.integrate;
+			catch
+				% sometimes the integration fails because the 
+				% mex file is "too short". goddamn it, matlab
+				continue
+			end
 
 			time_idx = time_idx + 1;
 
