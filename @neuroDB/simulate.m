@@ -137,7 +137,13 @@
 
 			% run the post_sample function
 			if ~isempty(self.post_sample_func)
-				new_metrics = self.post_sample_func(x,new_metrics);
+				try
+					new_metrics = self.post_sample_func(x,new_metrics);
+				catch
+					% sometimes the integration fails because the 
+					% mex file is "too short". goddamn it, matlab
+					continue
+				end
 			end
 
 			% append
