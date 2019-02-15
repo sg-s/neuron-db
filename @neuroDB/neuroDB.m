@@ -32,6 +32,9 @@ properties
 	keep_only_burst_period = [-Inf Inf];
 	keep_only_duty_cycle = [0  1];
 
+	post_sample_func@function_handle
+	data_dump
+
 end
 
 methods
@@ -60,6 +63,10 @@ methods
 
 
 	function runOnAllCores(self)
+
+		% check things to make sure they're OK
+		self.check;
+
 
 		self.current_pool = gcp;
 		self.num_workers = self.current_pool.NumWorkers - 1;
@@ -109,13 +116,16 @@ methods
 		results.add('f_up',10);
 		self.results = results;
 
-		save_dir = [fileparts(fileparts(which(mfilename))) filesep self.prefix];
+	end
 
-		if exist(save_dir,'dir') ~= 7
-			mkdir(save_dir)
+
+	function self = set.data_dump(self,value)
+		self.data_dump = value;
+		if exist(self.data_dump,'dir') ~= 7
+			mkdir(self.data_dump)
 		end
 
-		self.results.consolidate(save_dir);
+		self.results.consolidate(self.data_dump);
 
 	end
 

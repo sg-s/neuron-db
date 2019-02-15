@@ -1,6 +1,8 @@
 	function simulate(self)
 
 
+		self.check;
+
 		x = self.x;
 
 		n_sims = 0;
@@ -14,6 +16,18 @@
 		results.add('CV_ISI_up',10);
 		results.add('f_down',10);
 		results.add('f_up',10);
+
+		% also add fields from post_sample_func
+		if ~isempty(self.post_sample_func)
+			temp = struct;
+			temp = self.post_sample_func(x,temp);
+			fn = fieldnames(temp);
+			for i = 1:length(fn)
+				results.add(fn{i},length(temp.(fn{i})));
+			end
+		end
+
+
 		results.prealloc(self.sim_chunk_size);
 
 		while true
@@ -120,6 +134,12 @@
 			new_metrics.CV_ISI_up = data.CV_ISI_up;
 			new_metrics.CV_ISI_down = data.CV_ISI_down;
 
+
+			% run the post_sample function
+			if ~isempty(self.post_sample_func)
+				new_metrics = self.post_sample_func(x,new_metrics);
+			end
+
 			% append
 			new_metrics.all_g = this_all_g;
 			results+new_metrics;
@@ -129,7 +149,7 @@
 			if results.size == self.sim_chunk_size
 				% need to save 
 				disp('Saving...')
-				save_name = [fileparts(fileparts(which('neuroDB'))) filesep self.prefix GetMD5(now) '.data'];
+				save_name = [self.data_dump filesep GetMD5(now) '.data'];
 				results.save(save_name);
 
 				results.reset;
