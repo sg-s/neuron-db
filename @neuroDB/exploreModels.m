@@ -106,7 +106,7 @@ return
 % show_these = find((isnan(n.metrics.burst_period) | n.metrics.n_spikes_per_burst_mean == 1) & n.metrics.firing_rate > 3);
 
 
-show_these = shuffle(show_these);
+show_these = veclib.shuffle(show_these);
 
 
 for i = 1:length(show_these)
