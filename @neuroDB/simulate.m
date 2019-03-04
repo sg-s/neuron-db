@@ -86,45 +86,50 @@
 
 			if ~isempty(self.keep_only_burst_period)
 				if isnan(new_metrics.burst_period)
+					disp('Undefined burst period...')
 					continue
 				end
 			end
 
 			if ~isempty(self.keep_only_duty_cycle)
 				if isnan(new_metrics.duty_cycle_mean)
+					disp('Undefined duty_cycle_mean...')
 					continue
 				end
 			end
 
 			% ignore things outside keep_only
 			if new_metrics.duty_cycle_mean < self.keep_only_duty_cycle(1)
+				disp('Duty cycle outside range...')
 				continue
 			end
 
 			if new_metrics.duty_cycle_mean > self.keep_only_duty_cycle(2)
+				disp('Duty cycle outside range...')
 				continue
 			end
 
 			if new_metrics.burst_period < self.keep_only_burst_period(1)
+				disp('Burst period outside range...')
 				continue
 			end
 
 			if new_metrics.burst_period > self.keep_only_burst_period(2)
+				disp('Burst period outside range...')
 				continue
 			end
 
 
-			
-
+		
 			this_all_g = x.get('*gbar');
 
 			% show this live 
 			for i = 1:8
-				fprintf(flstring(oval(this_all_g(i)),10))
+				fprintf(strlib.fix(strlib.oval(this_all_g(i)),10))
 			end
 
-			fprintf(flstring(oval(new_metrics.firing_rate),10))
-			fprintf(flstring(oval(time_idx/t),10))
+			fprintf(strlib.fix(strlib.oval(new_metrics.firing_rate),10))
+			fprintf(strlib.fix(strlib.oval(time_idx/t),10))
 			fprintf('\n')
 
 			% measure the f-I curve
@@ -155,7 +160,7 @@
 			if results.size == self.sim_chunk_size
 				% need to save 
 				disp('Saving...')
-				save_name = [self.data_dump filesep GetMD5(now) '.data'];
+				save_name = [self.data_dump filesep hashlib.md5hash(now) '.data'];
 				results.save(save_name);
 
 				results.reset;

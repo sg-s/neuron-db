@@ -45,43 +45,8 @@ methods
 
 	end % constructor 
 
-	function varargout = show(self, idx)
-
-		self.x.set('*gbar',self.results.all_g(idx,:))
-		self.x.reset;
-		self.x.integrate;
-
-		if nargout == 1
-			V = self.x.integrate;
-			varargout{1} = V;
-			return
-
-		end
-		self.x.plot;
-
-	end
 
 
-	function runOnAllCores(self)
-
-		% check things to make sure they're OK
-		self.check;
-
-
-		self.current_pool = gcp;
-		self.num_workers = self.current_pool.NumWorkers - 1;
-
-		disp('Starting workers...')
-
-		for j = self.num_workers:-1:1
-			F(j) = parfeval(@self.simulate,0);
-			textbar(self.num_workers - j + 1,self.num_workers)
-		end
-
-		self.workers = F;
-
-	end
-	
 
 	function self = set.prefix(self, value)
 
