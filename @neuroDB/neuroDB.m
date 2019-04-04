@@ -90,7 +90,13 @@ methods
 			mkdir(self.data_dump)
 		end
 
-		self.results.consolidate(self.data_dump);
+		if self.results.size == 0
+			self.results = Data(self.data_dump);
+		else
+			self.results.consolidate(self.data_dump);
+		end
+
+		
 
 	end
 
