@@ -16,6 +16,7 @@
 		results.add('CV_ISI_up',10);
 		results.add('f_down',10);
 		results.add('f_up',10);
+		results.add('Ca_average',1);
 
 		% also add fields from post_sample_func
 		if ~isempty(self.post_sample_func)
@@ -64,6 +65,7 @@
 			catch
 				% sometimes the integration fails because the 
 				% mex file is "too short". goddamn it, matlab
+				pause(2)
 				continue
 			end
 
@@ -147,12 +149,14 @@
 				catch
 					% sometimes the integration fails because the 
 					% mex file is "too short". goddamn it, matlab
+					pause(2)
 					continue
 				end
 			end
 
 			% append
 			new_metrics.all_g = this_all_g;
+			new_metrics.Ca_average = x.get('*Ca_average');
 			results+new_metrics;
 
 			n_sims = n_sims + 1;
