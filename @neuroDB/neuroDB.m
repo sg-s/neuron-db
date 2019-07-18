@@ -29,8 +29,11 @@ properties
 
 	handles
 
+	% keep only
 	keep_only_burst_period = [-Inf Inf];
 	keep_only_duty_cycle = [0  1];
+	keep_only_func@function_handle
+
 
 	post_sample_func@function_handle
 	data_dump
@@ -73,13 +76,12 @@ methods
 
 		self.x = x;
 
-		results = new(Data(xtools.V2metrics(zeros(1e4,1))));
-		results.add('all_g',8);
-		results.add('CV_ISI_down',10);
-		results.add('CV_ISI_up',10);
-		results.add('f_down',10);
-		results.add('f_up',10);
-		self.results = results;
+		self.results = new(Data(xtools.V2metrics(zeros(1e4,1))));
+		self.results.add('all_g',8);
+		self.results.add('CV_ISI_down',10);
+		self.results.add('CV_ISI_up',10);
+		self.results.add('f_down',10);
+		self.results.add('f_up',10);
 
 	end
 

@@ -3,6 +3,7 @@
 if ~exist('n','var')
 	n = neuroDB;
 	n.prefix = 'prinz/';
+	n.data_dump = 'prinz/';
 end
 
 
