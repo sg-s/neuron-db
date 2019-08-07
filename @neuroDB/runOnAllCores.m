@@ -4,13 +4,13 @@ function runOnAllCores(self)
 self.check;
 
 
-self.current_pool = gcp;
-self.num_workers = self.current_pool.NumWorkers - 1;
+self.CurrentPool = gcp;
+self.NumWorkers = self.CurrentPool.NumWorkers - 1;
 
 disp('Starting workers...')
 
-for j = self.num_workers:-1:1
-	corelib.textbar(self.num_workers - j + 1,self.num_workers)
+for j = self.NumWorkers:-1:1
+	corelib.textbar(self.NumWorkers - j + 1,self.NumWorkers)
 	F(j) = parfeval(@self.simulate,0);
 	
 end

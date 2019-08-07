@@ -5,38 +5,43 @@ properties
 
 	x@xolotl
 
-	NaV_range = [0 5e3];
-	CaT_range = [0 125];
-	CaS_range = [0 200];
-	A_range = [0 500];
-	KCa_range = [0 300];
-	Kd_range = [0 2e3];
-	H_range = [0 1];
-	Leak_range = [0 1];
-
-
+	bounds@struct
+	
 	prefix@char
 
 	results@Data
 
 	workers
-	current_pool
-	num_workers
+	CurrentPool
+	NumWorkers
 
-	sim_chunk_size = 1e3
+	% how many models to save in one data dump?
+	SimChunkSize = 1e3
 
-	deletion_probability = .05
+
+	% with what probability should I drop channeles?
+	% only applies when SampleFcn is not set
+	DeletionProbability = .05
 
 	handles
 
 	% keep only
-	keep_only_burst_period = [-Inf Inf];
-	keep_only_duty_cycle = [0  1];
-	keep_only_func@function_handle
+	KeepOnly@struct
+	
 
 
-	post_sample_func@function_handle
-	data_dump
+	
+	DataDump
+
+	% allow user-defined custom sample function
+	SampleFcn@function_handle
+
+	% allow user to run some function on the model
+	% after we sample it
+	PostSampleFcn@function_handle
+
+	% allow user-defined custom keep only function
+	KeepOnlyFcn@function_handle
 
 end
 
@@ -44,6 +49,22 @@ methods
 
 	% constructor
 	function self = neuroDB()
+
+		% set up some bounds
+		bounds.NaV = [0 2e3];
+		bounds.CaT = [0 300];
+		bounds.CaS = [0 400];
+		bounds.ACurrent = [0 1e3];
+		bounds.KCa = [0 1e3];
+		bounds.Kd = [0 2e3];
+		bounds.HCurrent = [0 100];
+		bounds.Leak = [0 10];
+		self.bounds = bounds;
+
+		KeepOnly.BurstPeriod = [-Inf Inf];
+		KeepOnly.duty_cycle = [0  1];
+		self.KeepOnly = KeepOnly;
+
 
 
 	end % constructor 
@@ -86,16 +107,16 @@ methods
 	end
 
 
-	function self = set.data_dump(self,value)
-		self.data_dump = value;
-		if exist(self.data_dump,'dir') ~= 7
-			mkdir(self.data_dump)
+	function self = set.DataDump(self,value)
+		self.DataDump = value;
+		if exist(self.DataDump,'dir') ~= 7
+			mkdir(self.DataDump)
 		end
 
 		if self.results.size == 0
-			self.results = Data(self.data_dump);
+			self.results = Data(self.DataDump);
 		else
-			self.results.consolidate(self.data_dump);
+			self.results.consolidate(self.DataDump);
 		end
 
 		
