@@ -100,6 +100,17 @@ while true
 			disp('Undefined burst period...')
 			continue
 		end
+
+		if new_metrics.burst_period < self.KeepOnly.BurstPeriod(1)
+			disp('Burst period outside range...')
+			continue
+		end
+
+		if new_metrics.burst_period > self.KeepOnly.BurstPeriod(2)
+			disp('Burst period outside range...')
+			continue
+		end
+
 	end
 
 	if ~isempty(self.KeepOnly.DutyCycle)
@@ -107,28 +118,20 @@ while true
 			disp('Undefined duty_cycle_mean...')
 			continue
 		end
+
+		% ignore things outside keep_only
+		if new_metrics.duty_cycle_mean < self.KeepOnly.DutyCycle(1)
+			disp('Duty cycle outside range...')
+			continue
+		end
+
+		if new_metrics.duty_cycle_mean > self.KeepOnly.DutyCycle(2)
+			disp('Duty cycle outside range...')
+			continue
+		end
+
 	end
 
-	% ignore things outside keep_only
-	if new_metrics.duty_cycle_mean < self.KeepOnly.DutyCycle(1)
-		disp('Duty cycle outside range...')
-		continue
-	end
-
-	if new_metrics.duty_cycle_mean > self.KeepOnly.DutyCycle(2)
-		disp('Duty cycle outside range...')
-		continue
-	end
-
-	if new_metrics.burst_period < self.KeepOnly.BurstPeriod(1)
-		disp('Burst period outside range...')
-		continue
-	end
-
-	if new_metrics.burst_period > self.KeepOnly.BurstPeriod(2)
-		disp('Burst period outside range...')
-		continue
-	end
 
 
 

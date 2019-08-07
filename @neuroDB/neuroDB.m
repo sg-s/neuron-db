@@ -6,8 +6,7 @@ properties
 	x@xolotl
 
 	bounds@struct
-	
-	prefix@char
+
 
 	results@Data
 
@@ -51,7 +50,7 @@ methods
 	function self = neuroDB()
 
 		% set up some bounds
-		bounds.NaV = [0 2e3];
+		bounds.NaV = [1e3 2e3];
 		bounds.CaT = [0 300];
 		bounds.CaS = [0 400];
 		bounds.ACurrent = [0 1e3];
@@ -61,41 +60,9 @@ methods
 		bounds.Leak = [0 10];
 		self.bounds = bounds;
 
-		KeepOnly.BurstPeriod = [-Inf Inf];
-		KeepOnly.duty_cycle = [0  1];
+		KeepOnly.BurstPeriod = [];
+		KeepOnly.DutyCycle = [];
 		self.KeepOnly = KeepOnly;
-
-
-
-	end % constructor 
-
-
-
-
-	function self = set.prefix(self, value)
-
-		self.prefix = value;
-
-		% make xolotl object 
-		A = 0.0628;
-		channels = {'NaV','CaT','CaS','ACurrent','KCa','Kd','HCurrent'};
-		E =         [50   30  30 -80 -80 -80   -20];
-		x = xolotl;
-		x.add('compartment','AB','Cm',10,'A',A);
-		% add Calcium mechanism
-		x.AB.add('prinz/CalciumMech');
-		for i = 1:length(channels)
-			x.AB.add([self.prefix channels{i}],'gbar',rand*10,'E',E(i));
-		end
-		x.AB.add('Leak','gbar',0);
-
-		x.t_end = 20e3;
-		x.dt = .1;
-
-		x.transpile;
-		x.compile;
-
-		self.x = x;
 
 		self.results = new(Data(xtools.V2metrics(zeros(1e4,1))));
 		self.results.add('all_g',8);
@@ -104,7 +71,9 @@ methods
 		self.results.add('f_down',10);
 		self.results.add('f_up',10);
 
-	end
+
+
+	end % constructor 
 
 
 	function self = set.DataDump(self,value)
