@@ -3,6 +3,10 @@ function runOnAllCores(self)
 % check things to make sure they're OK
 self.check;
 
+% save the model in case we forget what it is
+x = self.x;
+
+save([self.DataDump filesep 'model.xolotl'],'x')
 
 self.CurrentPool = gcp;
 self.NumWorkers = self.CurrentPool.NumWorkers - 1;
