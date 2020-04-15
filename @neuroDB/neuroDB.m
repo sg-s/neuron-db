@@ -1,31 +1,31 @@
-classdef neuroDB < handle
+classdef neuroDB < ConstructableHandle
 
 
 properties
 
-	x@xolotl
+	x (1,1) xolotl
 
-	bounds@struct
+	bounds (1,1) struct
 
 
-	results@Data
+	results (1,1) Data
 
 	workers
 	CurrentPool
 	NumWorkers
 
 	% how many models to save in one data dump?
-	SimChunkSize = 1e3
+	SimChunkSize (1,1) double = 1e3
 
 
 	% with what probability should I drop channeles?
 	% only applies when SampleFcn is not set
-	DeletionProbability = .05
+	DeletionProbability (1,1) double = .05
 
 	handles
 
 	% keep only
-	KeepOnly@struct
+	KeepOnly (1,1) struct
 	
 
 
@@ -47,7 +47,8 @@ end
 methods
 
 	% constructor
-	function self = neuroDB()
+	function self = neuroDB(varargin)
+        self = self@ConstructableHandle(varargin{:});   
 
 		% set up some bounds
 		bounds.NaV = [1e3 2e3];

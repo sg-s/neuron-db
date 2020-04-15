@@ -2,9 +2,11 @@
 
 if ~exist('n','var')
 	n = neuroDB;
-	n.prefix = 'prinz/';
-	n.data_dump = 'prinz/';
+	n.DataDump = 'prinz/';
+	n.x = xolotl.examples.BurstingNeuron('prefix','prinz');
 end
+
+
 
 
 
